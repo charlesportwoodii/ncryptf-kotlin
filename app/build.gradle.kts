@@ -11,7 +11,7 @@ android {
         minSdkVersion(19)
         targetSdkVersion(28)
         versionCode = 1
-        versionName = "0.2.0"
+        versionName = "1"
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -20,6 +20,11 @@ android {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
+    }
+
+    sourceSets {
+        getByName("androidTest").java.srcDirs("src/androidTest/kotlin")
+        getByName("test").java.srcDirs("src/test/kotlin")
     }
 }
 
