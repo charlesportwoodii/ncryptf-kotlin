@@ -15,4 +15,5 @@ A Android library written in Kotlin for facilitating hashed based KDF signature 
 ```
 export ANDROID_HOME = /path/to/Android/sdk
 ./gradlew build
-./gradlew test
+./gradlew cAT
+```
