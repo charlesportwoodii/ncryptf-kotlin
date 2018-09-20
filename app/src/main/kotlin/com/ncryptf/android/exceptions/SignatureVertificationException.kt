@@ -1,0 +1,1 @@
+class SignatureVertificationException(override var message:String): Exception(message)

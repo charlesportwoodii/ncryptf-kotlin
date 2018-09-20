@@ -1,0 +1,1 @@
+class DecryptionFailedException(override var message:String): Exception(message)

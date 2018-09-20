@@ -19,7 +19,3 @@ allprojects {
         maven(url = "https://dl.bintray.com/terl/lazysodium-maven")
     }
 }
-
-tasks.register("clean", Delete::class) {
-    delete(rootProject.buildDir)
-}
