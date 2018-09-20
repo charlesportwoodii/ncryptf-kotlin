@@ -24,7 +24,6 @@ android {
 }
 
 dependencies {
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(kotlin("stdlib-jdk8", KotlinCompilerVersion.VERSION))
 
     implementation("com.goterl.lazycode:lazysodium-android:3.3.0@aar")
