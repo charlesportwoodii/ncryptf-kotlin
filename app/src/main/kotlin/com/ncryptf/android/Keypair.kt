@@ -1,5 +1,5 @@
 package com.ncryptf.android
 
-public class Keypair constructor(val secretKey: ByteArray, val publicKey: ByteArray)
+public data class Keypair constructor(val secretKey: ByteArray, val publicKey: ByteArray)
 {
 }

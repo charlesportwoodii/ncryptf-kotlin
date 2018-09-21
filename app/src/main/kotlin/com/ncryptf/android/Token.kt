@@ -5,7 +5,7 @@ import java.time.ZoneOffset
 
 import com.ncryptf.android.Utils
 
-public class Token constructor(val accessToken: String, val refreshToken: String, val ikm: ByteArray, val signature: ByteArray, val expiresAt: Double)
+public data class Token constructor(val accessToken: String, val refreshToken: String, val ikm: ByteArray, val signature: ByteArray, val expiresAt: Double)
 {
     public fun isExpired() : Boolean
     {
