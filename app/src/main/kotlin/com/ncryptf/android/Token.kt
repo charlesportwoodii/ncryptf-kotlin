@@ -5,8 +5,26 @@ import java.time.ZoneOffset
 
 import com.ncryptf.android.Utils
 
-public data class Token constructor(val accessToken: String, val refreshToken: String, val ikm: ByteArray, val signature: ByteArray, val expiresAt: Double)
+/**
+ * @constructor Data class for storing token details
+ * @property accessToken The access token
+ * @property refreshToken The refresh token
+ * @property ikm 32 byte initial key material
+ * @property signature The signature bytes
+ * @property expiresAt The token expiration time
+ */
+public data class Token constructor(
+    val accessToken: String,
+    val refreshToken: String,
+    val ikm: ByteArray,
+    val signature: ByteArray,
+    val expiresAt: Double
+)
 {
+    /**
+     * Returns true if the given token is expired, and false otherwise
+     * @return Boolean
+     */
     public fun isExpired() : Boolean
     {
         val now = ZonedDateTime.now(ZoneOffset.UTC).toEpochSecond()

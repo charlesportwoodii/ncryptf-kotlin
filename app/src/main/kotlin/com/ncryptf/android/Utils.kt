@@ -8,9 +8,18 @@ import com.goterl.lazycode.lazysodium.interfaces.Sign
 
 import com.ncryptf.android.Keypair
 
+/**
+ * Helper utilities
+ */
 public class Utils
 {
     companion object {
+        /**
+         * Zeros memory at the given ByteArray range
+         * Returns true if memory could be securely zeroed
+         * @param data
+         * @return Boolean
+         */
         @JvmStatic
         public fun zero(data: ByteArray) : Boolean
         {
@@ -24,6 +33,10 @@ public class Utils
             return true
         }
 
+        /**
+         * Returns a crypto box keypair (32 byte secret, 32 byte public)
+         * @return com.ncryptf.android.Keypair
+         */
         @JvmStatic
         public fun generateKeypair() : Keypair
         {
@@ -38,6 +51,10 @@ public class Utils
             }
         }
 
+        /**
+         * Returns a crypto sign keypair (64 byte secret, 32 byte public)
+         * @return com.ncryptf.android.Keypair
+         */
         @JvmStatic
         public fun generateSigningKeypair() : Keypair
         {

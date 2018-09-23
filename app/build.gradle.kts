@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("com.android.library")
     id("kotlin-android")
-    id("org.jetbrains.dokka") version "0.9.16"
+    id("org.jetbrains.dokka-android") version "0.9.17"
 }
 
 java {
@@ -62,9 +62,15 @@ android {
     }
 }
 
-val dokka by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class) {    
+val dokka by tasks.getting(org.jetbrains.dokka.gradle.DokkaAndroidTask::class) {    
     outputFormat = "html"
     outputDirectory = "$buildDir/javadoc"
+    jdkVersion = 8
+    reportUndocumented = true
+    skipEmptyPackages = true
+    noStdlibLink = false
+    skipDeprecated = false
+    sourceDirs = files("src/main/kotlin")
 }
 
 dependencies {
