@@ -1,7 +1,6 @@
 import org.junit.Test
 import org.junit.Assert.*
 import com.ncryptf.android.Signature
-import android.util.Log
 
 public class SignatureTest: AbstractTest()
 {

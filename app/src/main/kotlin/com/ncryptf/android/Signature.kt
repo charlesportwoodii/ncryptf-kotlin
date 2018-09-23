@@ -8,6 +8,7 @@ import com.goterl.lazycode.lazysodium.LazySodiumAndroid
 import com.goterl.lazycode.lazysodium.SodiumAndroid
 import com.goterl.lazycode.lazysodium.interfaces.GenericHash
 
+import org.apache.commons.codec.binary.Hex
 import org.apache.commons.codec.digest.DigestUtils
 
 public class Signature
@@ -55,7 +56,7 @@ public class Signature
                 return String(Base64.getEncoder().encode(h))
             }
 
-            return DigestUtils.sha256Hex(data).toLowerCase()
+            return String(Hex.encodeHex(DigestUtils.sha256(data))).toLowerCase()
         }
     }
 }

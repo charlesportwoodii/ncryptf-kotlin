@@ -4,14 +4,10 @@ import java.time.ZonedDateTime;
 
 import java.util.Base64
 import org.junit.Assert.*
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.Test
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 
 import com.ncryptf.android.Token
 
-@TestInstance(Lifecycle.PER_CLASS)
 abstract class AbstractTest
 {
     protected var date: ZonedDateTime

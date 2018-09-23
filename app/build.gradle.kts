@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.config.KotlinCompilerVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import de.mannodermaus.gradle.plugins.junit5.*
+//import de.mannodermaus.gradle.plugins.junit5.*
 
 plugins {
     id("com.android.library")
@@ -8,15 +8,20 @@ plugins {
     id("org.jetbrains.dokka") version "0.9.16"
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 android {
     compileSdkVersion(28)
     defaultConfig {
-        minSdkVersion(26)
+        minSdkVersion(19)
         targetSdkVersion(28)
         versionCode = 1
         versionName = "1"
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunnerArgument("runnerBuilder", "de.mannodermaus.junit5.AndroidJUnit5Builder")
+        //testInstrumentationRunnerArgument("runnerBuilder", "de.mannodermaus.junit5.AndroidJUnit5Builder")
     }
 
     buildTypes {
@@ -29,11 +34,6 @@ android {
     sourceSets {
         getByName("androidTest").java.srcDirs("src/androidTest/kotlin")
         getByName("test").java.srcDirs("src/test/kotlin")
-    }
-
-    compileOptions {
-        setSourceCompatibility(JavaVersion.VERSION_1_8)
-        setTargetCompatibility(JavaVersion.VERSION_1_8)
     }
 
     tasks.withType<KotlinCompile> {
@@ -51,12 +51,13 @@ android {
         exclude("**/*.txt")
         exclude("**/*.xml")
         exclude("**/*.properties")
+        exclude("app/src/androidTest/**")
     }
 
     testOptions {
         unitTests.apply {
             isReturnDefaultValues = true
-            isIncludeAndroidResources = true
+            isIncludeAndroidResources = false
         }
     }
 }
@@ -75,16 +76,19 @@ dependencies {
     implementation("at.favre.lib:hkdf:1.0.0:@jar")
     implementation("commons-codec:commons-codec:1.11:@jar")
     
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.2.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.2.0")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.2.0")
+    testImplementation("junit:junit:4.12")
 
-    androidTestImplementation("org.junit.jupiter:junit-jupiter-api:5.2.0")
-    androidTestImplementation("de.mannodermaus.junit5:android-instrumentation-test:0.2.2")
+    androidTestImplementation("com.android.support.test:runner:1.0.2")
+    androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.2")
+    
+    //testImplementation("org.junit.jupiter:junit-jupiter-api:5.2.0")
+    //testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.2.0")
+    //testImplementation("org.junit.jupiter:junit-jupiter-params:5.2.0")
 
-    androidTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.2.0")
-    androidTestRuntimeOnly("org.junit.platform:junit-platform-runner:1.2.0")
-    androidTestRuntimeOnly("de.mannodermaus.junit5:android-instrumentation-test-runner:0.2.2")
-    //androidTestImplementation("com.android.support.test:runner:1.0.2")
-    //androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.2")
+    //androidTestImplementation("org.junit.jupiter:junit-jupiter-api:5.2.0")
+    //androidTestImplementation("de.mannodermaus.junit5:android-instrumentation-test:0.2.2")
+
+    //androidTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.2.0")
+    //androidTestRuntimeOnly("org.junit.platform:junit-platform-runner:1.2.0")
+    //androidTestRuntimeOnly("de.mannodermaus.junit5:android-instrumentation-test-runner:0.2.2")
 }
