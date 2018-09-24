@@ -1,5 +1,6 @@
 package com.ncryptf.android
 
+import java.lang.IllegalArgumentException
 import java.io.UnsupportedEncodingException
 import java.security.InvalidKeyException
 import java.security.NoSuchAlgorithmException
@@ -12,22 +13,24 @@ import javax.crypto.spec.SecretKeySpec
 
 import com.goterl.lazycode.lazysodium.LazySodiumAndroid
 import com.goterl.lazycode.lazysodium.SodiumAndroid
+import com.ncryptf.android.exceptions.KeyDerivationException
 
 import at.favre.lib.crypto.HKDF
-import com.ncryptf.android.exceptions.KeyDerivationException
-import com.ncryptf.android.Token
+
+import org.apache.commons.codec.binary.Hex
+import org.apache.commons.codec.digest.DigestUtils
 
 /**
  * Generates an signed & versioned Authorization HTTP header from a generate [Signature]
  *
- * @constructor            Generates a versioned Authorization HTTP header
- * @property httpMethod    The HTTP method
- * @property uri           The URI with query string parameters
- * @property token         A Token object
- * @property date          A ZonedDateTime object
- * @property payload       String payload
- * @property version       The version to generate
- * @property salt          Optional 32 byte fixed salt value
+ * @constructor         Generates a versioned Authorization HTTP header
+ * @param httpMethod    The HTTP method
+ * @param uri           The URI with query string parameters
+ * @param token         A Token object
+ * @param date          A ZonedDateTime object
+ * @param payload       String payload
+ * @param version       The version to generate
+ * @param salt          Optional 32 byte fixed salt value
  */
 public class Authorization constructor(
         private val httpMethod: String,
@@ -96,7 +99,7 @@ public class Authorization constructor(
         token: Token,
         date: ZonedDateTime,
         payload: String,
-        version: Int
+        version: Int = 2
     ) : this(httpMethod, uri, token, date, payload, version, null)
 
     init {
@@ -106,22 +109,42 @@ public class Authorization constructor(
             this.salt = this.sodium.randomBytesBuf(32)
         }
 
+        if (this.salt?.size != 32) {
+            throw IllegalArgumentException()
+        }
+
         this.signature = Signature.derive(
             method,
             this.uri,
-            this.salt!!,
+            this.salt as ByteArray,
             this.date,
             this.payload,
             version
         )
-
+        
         val hkdf: ByteArray = HKDF.fromHmacSha256().expand(
-            HKDF.fromHmacSha256().extract(this.salt, this.token.ikm),
+            HKDF.fromHmacSha256().extract(this.salt as ByteArray, this.token.ikm),
             Authorization.AUTH_INFO.toByteArray(),
             32
         )
-        this.hmac = ByteArray(32)
-        this.signature = ""
+
+        try {
+            val hkdfString: String = String(Hex.encodeHex(hkdf))
+            val key: ByteArray = hkdfString.toLowerCase().toByteArray()
+            val sig: ByteArray = this.signature.toByteArray()
+
+            val HMAC: Mac = Mac.getInstance("HMACSHA256")
+            val secretKey: SecretKeySpec = SecretKeySpec(key, "HMACSHA256")
+            
+            HMAC.init(secretKey)
+            this.hmac = HMAC.doFinal(sig)
+        } catch (e: NoSuchAlgorithmException) {
+            throw KeyDerivationException("")
+        } catch (e: InvalidKeyException) {
+            throw KeyDerivationException("")
+        } catch (e: UnsupportedEncodingException) {
+            throw KeyDerivationException("")
+        }
     }
 
     /**
@@ -167,7 +190,7 @@ public class Authorization constructor(
      */
     public fun getEncodedSalt(): String
     {
-        return Base64.getEncoder().encodeToString(this.salt);
+        return Base64.getEncoder().encodeToString(this.salt)
     }
 
     /**
@@ -193,7 +216,7 @@ public class Authorization constructor(
             json = json.replace("/", "\\/")
 
             val b64: String = Base64.getEncoder().encodeToString(json.toByteArray())
-            return "HMAC " + b64;
+            return "HMAC " + b64
         }
 
         return "HMAC " + this.token.accessToken + "," + hmac + "," + salt

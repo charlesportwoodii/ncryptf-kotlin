@@ -70,8 +70,10 @@ val dokka by tasks.getting(org.jetbrains.dokka.gradle.DokkaAndroidTask::class) {
     skipEmptyPackages = true
     noStdlibLink = false
     skipDeprecated = false
-    sourceDirs = files("src/main/kotlin")
 }
+
+val version = KotlinCompilerVersion.VERSION
+println("Kotlin Version: " + version)
 
 dependencies {
     implementation(kotlin("stdlib-jdk8", KotlinCompilerVersion.VERSION))

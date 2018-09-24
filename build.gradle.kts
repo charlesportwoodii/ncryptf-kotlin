@@ -8,7 +8,7 @@ buildscript {
 
     dependencies {
         classpath("com.android.tools.build:gradle:3.1.0")
-        classpath(kotlin("gradle-plugin", version = "1.2.70"))
+        classpath(kotlin("gradle-plugin", version = "1.2.71"))
         //classpath("de.mannodermaus.gradle.plugins:android-junit5:1.2.0.0")
     }
 }
@@ -19,4 +19,8 @@ allprojects {
         jcenter()
         maven(url = "https://dl.bintray.com/terl/lazysodium-maven")
     }
+}
+
+tasks.register("clean", Delete::class) {
+    delete(rootProject.buildDir)
 }

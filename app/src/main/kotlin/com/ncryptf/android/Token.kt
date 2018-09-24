@@ -7,11 +7,11 @@ import com.ncryptf.android.Utils
 
 /**
  * @constructor Data class for storing token details
- * @property accessToken The access token
- * @property refreshToken The refresh token
- * @property ikm 32 byte initial key material
- * @property signature The signature bytes
- * @property expiresAt The token expiration time
+ * @param accessToken The access token
+ * @param refreshToken The refresh token
+ * @param ikm 32 byte initial key material
+ * @param signature The signature bytes
+ * @param expiresAt The token expiration time
  */
 public data class Token constructor(
     val accessToken: String,

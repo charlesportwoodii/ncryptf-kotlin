@@ -13,7 +13,7 @@ class UtilsTest
     @Test
     fun testKeypairGeneration()
     {
-        val kp: Keypair = Utils.generateKeypair()
+        val kp: Keypair = Utils.generateKeypair() as Keypair
         assertEquals(32, kp.publicKey.size)
         assertEquals(32, kp.secretKey.size)
     }
@@ -21,7 +21,7 @@ class UtilsTest
     @Test
     fun testSigningKeypairGeneration()
     {
-        val kp: Keypair = Utils.generateSigningKeypair()
+        val kp: Keypair = Utils.generateSigningKeypair() as Keypair
         assertEquals(32, kp.publicKey.size)
         assertEquals(64, kp.secretKey.size)
     }

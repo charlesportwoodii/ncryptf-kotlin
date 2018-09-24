@@ -38,7 +38,7 @@ public class Utils
          * @return com.ncryptf.android.Keypair
          */
         @JvmStatic
-        public fun generateKeypair() : Keypair
+        public fun generateKeypair() : Keypair?
         {
             try {
                 val sodium = LazySodiumAndroid(SodiumAndroid())
@@ -47,7 +47,7 @@ public class Utils
 
                 return com.ncryptf.android.Keypair(kp.getSecretKey().getAsBytes(), kp.getPublicKey().getAsBytes())
             } catch (e: SodiumException) {
-                return null!!
+                return null
             }
         }
 
@@ -56,7 +56,7 @@ public class Utils
          * @return com.ncryptf.android.Keypair
          */
         @JvmStatic
-        public fun generateSigningKeypair() : Keypair
+        public fun generateSigningKeypair() : Keypair?
         {
             try {
                 val sodium = LazySodiumAndroid(SodiumAndroid())
@@ -65,7 +65,7 @@ public class Utils
 
                 return com.ncryptf.android.Keypair(kp.getSecretKey().getAsBytes(), kp.getPublicKey().getAsBytes())
             } catch (e: SodiumException) {
-                return null!!
+                return null
             }
         }
     }
