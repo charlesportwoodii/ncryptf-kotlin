@@ -4,6 +4,7 @@ import java.lang.IllegalArgumentException
 import java.io.UnsupportedEncodingException
 import java.security.InvalidKeyException
 import java.security.NoSuchAlgorithmException
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Base64
@@ -15,10 +16,9 @@ import com.goterl.lazycode.lazysodium.LazySodiumAndroid
 import com.goterl.lazycode.lazysodium.SodiumAndroid
 import com.ncryptf.android.exceptions.KeyDerivationException
 
-import at.favre.lib.crypto.HKDF
-
 import org.apache.commons.codec.binary.Hex
-import org.apache.commons.codec.digest.DigestUtils
+
+import at.favre.lib.crypto.HKDF
 
 /**
  * Generates an signed & versioned Authorization HTTP header from a generate [Signature]
@@ -220,5 +220,39 @@ public class Authorization constructor(
         }
 
         return "HMAC " + this.token.accessToken + "," + hmac + "," + salt
+    }
+
+    /**
+     * Validates a provided HMAC against an auth object and a drift
+     *
+     * @param hmac              32 byte HMAC
+     * @param auth              Authorization object generated from HTTP request
+     * @param driftAllowance    Number of seconds that the request may be permitted to drift bt
+     * @return boolean
+     */
+     public fun verify(hmac: ByteArray, auth: Authorization, driftAllowance: Int = 90): Boolean
+     {
+         val drift: Int = this.getTimeDrift(auth.getDate())
+         if (drift >= driftAllowance) {
+             return false
+         }
+
+        if (this.sodium.getSodium().sodium_memcmp(hmac, auth.getHMAC(), 32) == 0) {
+            return true
+        }
+
+        return false
+     }
+
+    /**
+     * Calculates the time difference between now and the provided date
+     * @param date      The date to compare against
+     * @return Int
+     */
+    private fun getTimeDrift(date: ZonedDateTime): Int
+    {
+        val now: ZonedDateTime = ZonedDateTime.now(ZoneOffset.UTC)
+
+        return Math.abs(now.toEpochSecond() - date.toEpochSecond()).toInt()
     }
 }

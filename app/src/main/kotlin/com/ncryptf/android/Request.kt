@@ -129,7 +129,7 @@ public class Request constructor(
 
                 val payload: ByteArray = stream.toByteArray()
 
-                val gh: GenericHash.Native = sodium as GenericHash.Native
+                val gh: GenericHash.Native = this.sodium
 
                 var checksum: ByteArray = ByteArray(64)
                 if (!gh.cryptoGenericHash(checksum, 64, payload, payload.size.toLong(), nonce, nonce.size)) {
@@ -159,7 +159,7 @@ public class Request constructor(
      */
     private fun encryptBody(data: String, nonce: ByteArray) : ByteArray?
     {
-        val box: Box.Native = sodium as Box.Native
+        val box: Box.Native = this.sodium
         val message: ByteArray = data.toByteArray()
         var cipher: ByteArray = ByteArray(Box.MACBYTES + message.size)
 
@@ -191,7 +191,7 @@ public class Request constructor(
     {
         val message: ByteArray = data.toByteArray()
         var signature: ByteArray = ByteArray(Sign.BYTES)
-        val sign: Sign.Native = sodium as Sign.Native
+        val sign: Sign.Native = this.sodium
 
         val result: Boolean = sign.cryptoSignDetached(
             signature,

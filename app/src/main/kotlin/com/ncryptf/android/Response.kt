@@ -59,6 +59,10 @@ public class Response constructor(
      */
     public fun decrypt(response: ByteArray) : String?
     {
+        if (response.size < 236) {
+            throw DecryptionFailedException("Message size is too small.")
+        }
+
         val nonce = Arrays.copyOfRange(response, 4, 28)
         return this.decrypt(response, nonce)
     }
@@ -93,7 +97,7 @@ public class Response constructor(
             val payload: ByteArray = Arrays.copyOfRange(response, 0, response.size - 64)
             val checksum: ByteArray = Arrays.copyOfRange(response, response.size - 64, response.size)
 
-            val gh: GenericHash.Native = sodium as GenericHash.Native
+            val gh: GenericHash.Native = this.sodium
             var calculatedChecksum: ByteArray = ByteArray(64)
             if (!gh.cryptoGenericHash(calculatedChecksum, 64, payload, payload.size.toLong(), nonce, nonce.size)) {
                 throw DecryptionFailedException("Unable to calculate checksum for message.");
@@ -117,14 +121,14 @@ public class Response constructor(
             }
 
             try {
-                if (!this.isSignatureValid(decryptedPayload as String, signature, sigPubKey)) {
+                if (!this.isSignatureValid(decryptedPayload, signature, sigPubKey)) {
                     throw InvalidSignatureException("The signature associated to the message is not valid.")
                 }
             } catch (e: SignatureVerificationException) {
                 throw InvalidSignatureException("The signature associated to the message is not valid.")
             }
 
-            return decryptedPayload as String
+            return decryptedPayload
         }
 
         return this.decryptBody(response, nonce)
@@ -140,7 +144,7 @@ public class Response constructor(
      */
     private fun decryptBody(response: ByteArray, nonce: ByteArray) : String?
     {
-        val box: Box.Native = sodium as Box.Native
+        val box: Box.Native = this.sodium
         if (response.size < Box.MACBYTES) {
             throw DecryptionFailedException("Message size is too short.")
         }
@@ -180,7 +184,7 @@ public class Response constructor(
      */
     public fun isSignatureValid(response: String, signature: ByteArray, publicKey: ByteArray) : Boolean
     {
-        val sign: Sign.Native = sodium as Sign.Native
+        val sign: Sign.Native = this.sodium
         val message: ByteArray = response.toByteArray()
 
         return sign.cryptoSignVerifyDetached(

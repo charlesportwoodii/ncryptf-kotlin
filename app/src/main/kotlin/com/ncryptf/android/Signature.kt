@@ -72,7 +72,7 @@ public class Signature
         {
             if (version == 2) {
                 val sodium = LazySodiumAndroid(SodiumAndroid())
-                val gh: GenericHash.Native = sodium as GenericHash.Native
+                val gh: GenericHash.Native = sodium
                 val h = ByteArray(64)
                 val dataBytes = data.toByteArray()
                 gh.cryptoGenericHash(

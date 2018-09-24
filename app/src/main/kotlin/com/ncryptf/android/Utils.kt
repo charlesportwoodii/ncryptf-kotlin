@@ -42,7 +42,7 @@ public class Utils
         {
             try {
                 val sodium = LazySodiumAndroid(SodiumAndroid())
-                val box: Box.Lazy = sodium as Box.Lazy
+                val box: Box.Lazy = sodium
                 val kp = box.cryptoBoxKeypair()
 
                 return com.ncryptf.android.Keypair(kp.getSecretKey().getAsBytes(), kp.getPublicKey().getAsBytes())
@@ -60,7 +60,7 @@ public class Utils
         {
             try {
                 val sodium = LazySodiumAndroid(SodiumAndroid())
-                val sign: Sign.Lazy = sodium as Sign.Lazy
+                val sign: Sign.Lazy = sodium
                 val kp = sign.cryptoSignKeypair()
 
                 return com.ncryptf.android.Keypair(kp.getSecretKey().getAsBytes(), kp.getPublicKey().getAsBytes())

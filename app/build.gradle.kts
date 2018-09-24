@@ -19,9 +19,25 @@ android {
         minSdkVersion(19)
         targetSdkVersion(28)
         versionCode = 1
-        versionName = "1"
+        versionName = "0.2.0"
+        multiDexEnabled = true
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
         //testInstrumentationRunnerArgument("runnerBuilder", "de.mannodermaus.junit5.AndroidJUnit5Builder")
+    }
+
+    dexOptions {
+        preDexLibraries = false
+        dexInProcess = false
+    }
+
+    lintOptions {
+        isAbortOnError = false
+        textReport = true
+        textOutput("stdout")
+        isCheckAllWarnings = true
+        isWarningsAsErrors = true
+        isCheckReleaseBuilds = false
+        isCheckTestSources = true
     }
 
     buildTypes {
