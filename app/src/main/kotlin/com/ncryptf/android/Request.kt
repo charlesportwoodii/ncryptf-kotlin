@@ -96,7 +96,7 @@ public class Request constructor(
                 throw EncryptionFailedException("A signature key is expected.")
             }
 
-            val header: ByteArray = Hex.decodeHex("DE259002")
+            val header: ByteArray = this.sodium.toBinary("DE259002")
             val body = this.encryptBody(data, nonce)
             if (body == null) {
                 throw EncryptionFailedException("Failed to encrypt message.")

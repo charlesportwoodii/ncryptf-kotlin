@@ -3,11 +3,7 @@ language: android
 
 env:
   matrix:
-    - ANDROID_API=19 ANDROID_BUILD_TOOLS=19.1.0
-    - ANDROID_API=24 ANDROID_BUILD_TOOLS=24.0.2
     - ANDROID_API=28 ANDROID_BUILD_TOOLS=28.0.3
-  global:
-    - ADB_INSTALL_TIMEOUT=5 # minutes
 
 android:
   components:
@@ -30,3 +26,11 @@ script:
   - "./gradlew clean build --stacktrace"
   - "./gradlew :app:assembleDebug"
   - "./gradlew :app:assembleDebugAndroidTest"
+#  - gcloud firebase test android run \
+#      --type instrumentation \
+#      --test ./app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
+#      --os-version-ids 19,20,21,22,23,24,25,26,27,28 \
+#      --device-ids NexusLowRes,Nexus5 \
+#      --app ./app/dummy.apk \
+#      --no-record-video \
+#      --no-performance-metrics

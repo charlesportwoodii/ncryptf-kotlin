@@ -3,11 +3,11 @@ import org.junit.Assert.*
 import com.ncryptf.android.Authorization
 import com.ncryptf.android.exceptions.KeyDerivationException
 
-import java.util.Base64;
+import android.util.Base64;
 import org.json.JSONObject;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import org.threeten.bp.ZoneOffset;
+import org.threeten.bp.ZonedDateTime;
 
 public class AuthorizationTest: AbstractTest()
 {
@@ -30,7 +30,7 @@ public class AuthorizationTest: AbstractTest()
                 val header: String = this.v1HMACHeaders[index++]
                 assertEquals(header, auth.getHeader())
                 val r = header.split(",")
-                val hmac: ByteArray = Base64.getDecoder().decode(r[1])
+                val hmac: ByteArray = Base64.decode(r[1], Base64.DEFAULT)
                 assertEquals(false, auth.verify(hmac, auth, 90))
             } catch (e: KeyDerivationException) {
                 fail("KeyDerivationException")
@@ -56,8 +56,8 @@ public class AuthorizationTest: AbstractTest()
 
                 val header: String = this.v2HMACHeaders[index++]
                 assertEquals(header, auth.getHeader())
-                val json = JSONObject(String(Base64.getDecoder().decode(header.replace("HMAC ", ""))))
-                val hmac: ByteArray = Base64.getDecoder().decode(json.getString("hmac"))
+                val json = JSONObject(String(Base64.decode(header.replace("HMAC ", ""), Base64.DEFAULT)))
+                val hmac: ByteArray = Base64.decode(json.getString("hmac"), Base64.DEFAULT)
                 assertEquals(false, auth.verify(hmac, auth, 90))
             } catch (e: KeyDerivationException) {
                 fail("KeyDerivationException")

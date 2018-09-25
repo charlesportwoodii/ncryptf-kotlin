@@ -14,8 +14,6 @@ import com.ncryptf.android.exceptions.InvalidChecksumException
 import com.ncryptf.android.exceptions.InvalidSignatureException
 import com.ncryptf.android.exceptions.SignatureVerificationException
 
-import org.apache.commons.codec.binary.Hex
-
 /**
  * @constructor Primary constructor to decrypt a response
  * @param secretKey
@@ -211,7 +209,7 @@ public class Response constructor(
         }
 
         val header: ByteArray = Arrays.copyOfRange(response, 0, 4)
-        val hex: String = String(Hex.encodeHex(header)).toUpperCase()
+        val hex: String = this.sodium.toHexStr(header).toUpperCase()
 
         if (hex.equals("DE259002")) {
             return 2

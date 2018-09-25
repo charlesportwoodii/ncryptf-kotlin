@@ -4,10 +4,10 @@ import java.lang.IllegalArgumentException
 import java.io.UnsupportedEncodingException
 import java.security.InvalidKeyException
 import java.security.NoSuchAlgorithmException
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Base64
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.ZonedDateTime
+import org.threeten.bp.format.DateTimeFormatter
+import android.util.Base64
 
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
@@ -15,8 +15,6 @@ import javax.crypto.spec.SecretKeySpec
 import com.goterl.lazycode.lazysodium.LazySodiumAndroid
 import com.goterl.lazycode.lazysodium.SodiumAndroid
 import com.ncryptf.android.exceptions.KeyDerivationException
-
-import org.apache.commons.codec.binary.Hex
 
 import at.favre.lib.crypto.HKDF
 
@@ -129,7 +127,7 @@ public class Authorization constructor(
         )
 
         try {
-            val hkdfString: String = String(Hex.encodeHex(hkdf))
+            val hkdfString: String = this.sodium.toHexStr(hkdf).toUpperCase()
             val key: ByteArray = hkdfString.toLowerCase().toByteArray()
             val sig: ByteArray = this.signature.toByteArray()
 
@@ -181,7 +179,7 @@ public class Authorization constructor(
      */
     public fun getEncodedHMAC(): String
     {
-        return Base64.getEncoder().encodeToString(this.hmac)
+        return Base64.encodeToString(this.hmac, Base64.DEFAULT or Base64.NO_WRAP)
     }
 
     /**
@@ -190,7 +188,7 @@ public class Authorization constructor(
      */
     public fun getEncodedSalt(): String
     {
-        return Base64.getEncoder().encodeToString(this.salt)
+        return Base64.encodeToString(this.salt, Base64.DEFAULT or Base64.NO_WRAP)
     }
 
     /**
@@ -215,7 +213,7 @@ public class Authorization constructor(
             var json: String = "{\"access_token\":\"" + this.token.accessToken + "\",\"date\":\"" + this.getDateString() + "\",\"hmac\":\"" + hmac +"\",\"salt\":\"" + salt + "\",\"v\":2}"
             json = json.replace("/", "\\/")
 
-            val b64: String = Base64.getEncoder().encodeToString(json.toByteArray())
+            val b64: String = Base64.encodeToString(json.toByteArray(), Base64.DEFAULT or Base64.NO_WRAP)
             return "HMAC " + b64
         }
 

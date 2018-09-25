@@ -2,6 +2,9 @@ import org.junit.Test
 import org.junit.Assert.*
 import com.ncryptf.android.Signature
 
+import android.util.Base64;
+import org.json.JSONObject;
+
 public class SignatureTest: AbstractTest()
 {
     @Test

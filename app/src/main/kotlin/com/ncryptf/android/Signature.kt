@@ -1,14 +1,13 @@
 package com.ncryptf.android
 
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Base64
+import org.threeten.bp.ZonedDateTime
+import org.threeten.bp.format.DateTimeFormatter
+import android.util.Base64
 
 import com.goterl.lazycode.lazysodium.LazySodiumAndroid
 import com.goterl.lazycode.lazysodium.SodiumAndroid
 import com.goterl.lazycode.lazysodium.interfaces.GenericHash
 
-import org.apache.commons.codec.binary.Hex
 import org.apache.commons.codec.digest.DigestUtils
 
 /**
@@ -50,7 +49,7 @@ public class Signature
             val method = httpMethod.toUpperCase()
 
             val hash: String = this.getSignatureHash(payload, salt, version)
-            val b64Salt: String = String(Base64.getEncoder().encode(salt))
+            val b64Salt: String = Base64.encodeToString(salt, Base64.DEFAULT or Base64.NO_WRAP)
             val timestamp: String = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss Z").format(date).replace(" GMT", " +0000");
 
             return hash + "\n" + 
@@ -70,8 +69,9 @@ public class Signature
         @JvmStatic
         private fun getSignatureHash(data: String, salt: ByteArray, version: Int) : String
         {
+            val sodium = LazySodiumAndroid(SodiumAndroid())
+
             if (version == 2) {
-                val sodium = LazySodiumAndroid(SodiumAndroid())
                 val gh: GenericHash.Native = sodium
                 val h = ByteArray(64)
                 val dataBytes = data.toByteArray()
@@ -84,10 +84,10 @@ public class Signature
                     salt.size
                 )
 
-                return String(Base64.getEncoder().encode(h))
+                return Base64.encodeToString(h, Base64.DEFAULT or Base64.NO_WRAP)
             }
 
-            return String(Hex.encodeHex(DigestUtils.sha256(data))).toLowerCase()
+            return sodium.toHexStr(DigestUtils.sha256(data)).toLowerCase()
         }
     }
 }

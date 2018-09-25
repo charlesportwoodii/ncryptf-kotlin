@@ -97,12 +97,16 @@ dependencies {
     implementation("com.goterl.lazycode:lazysodium-android:3.3.0@aar")
     implementation("net.java.dev.jna:jna:4.5.2@aar")
 
-    implementation("at.favre.lib:hkdf:1.0.0:@jar")
+    implementation("at.favre.lib:hkdf:1.0.0")
     implementation("commons-codec:commons-codec:1.11:@jar")
-    
+
+    // for java.time.* classes
+    implementation("com.jakewharton.threetenabp:threetenabp:1.1.0")
     testImplementation("junit:junit:4.12")
 
     androidTestImplementation("com.android.support.test:runner:1.0.2")
+    androidTestImplementation("com.android.support.test:rules:1.0.2")
+
     androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.2")
     
     //testImplementation("org.junit.jupiter:junit-jupiter-api:5.2.0")
