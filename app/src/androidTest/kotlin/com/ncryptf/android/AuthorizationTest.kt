@@ -1,3 +1,5 @@
+package com.ncryptf.android.Test
+
 import org.junit.Test
 import org.junit.Assert.*
 import com.ncryptf.android.Authorization

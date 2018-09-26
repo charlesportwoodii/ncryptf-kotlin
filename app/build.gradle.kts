@@ -45,11 +45,15 @@ android {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
+
+        getByName("debug") {
+           proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+           multiDexKeepProguard = file("proguard-multidex-rules.pro")
+        }
     }
 
     sourceSets {
         getByName("androidTest").java.srcDirs("src/androidTest/kotlin")
-        getByName("test").java.srcDirs("src/test/kotlin")
     }
 
     tasks.withType<KotlinCompile> {

@@ -1,3 +1,5 @@
+package com.ncryptf.android.Test
+
 import org.threeten.bp.Instant;
 import org.threeten.bp.ZoneOffset;
 import org.threeten.bp.ZonedDateTime;
@@ -7,6 +9,7 @@ import org.junit.Assert.*
 import org.junit.Test
 
 import com.ncryptf.android.Token
+import com.ncryptf.android.Test.TestCase
 
 abstract class AbstractTest
 {

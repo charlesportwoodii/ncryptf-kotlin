@@ -1,3 +1,5 @@
+package com.ncryptf.android.Test
+
 import com.goterl.lazycode.lazysodium.LazySodiumAndroid
 import com.goterl.lazycode.lazysodium.SodiumAndroid
 
