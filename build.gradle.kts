@@ -7,7 +7,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:3.1.0")
+        classpath("com.android.tools.build:gradle:3.2.0")
         classpath(kotlin("gradle-plugin", version = "1.2.71"))
         //classpath("de.mannodermaus.gradle.plugins:android-junit5:1.2.0.0")
     }
