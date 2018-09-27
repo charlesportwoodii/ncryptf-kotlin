@@ -1,6 +1,6 @@
 # ncryptf Kotlin (Android)
 
-[![TravisCI](https://img.shields.io/travis/charlesportwoodii/ncryptf-kotlin.svg?style=flat-square "TravisCI")](https://travis-ci.org/charlesportwoodii/ncryptf-kotlin)
+[![TravisCI](https://img.shields.io/travis/charlesportwoodii/ncryptf-kotlin.svg?style=flat-square "TravisCI")](https://travis-ci.com/charlesportwoodii/ncryptf-kotlin)
 [![License](https://img.shields.io/badge/license-BSD-orange.svg?style=flat-square "License")](https://github.com/charlesportwoodii/ncryptf-kotlin/blob/master/LICENSE.md)
 
 <center>
