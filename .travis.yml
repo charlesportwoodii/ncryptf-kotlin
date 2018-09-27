@@ -27,9 +27,7 @@ licenses:
   - ".+"
 
 before_install:
-  - openssl aes-256-cbc -K $encrypted_b23950c7c963_key -iv $encrypted_b23950c7c963_iv
-    -in ncryptf-travisci-2d6108f9a4f5.json.enc -out $HOME/ncryptf-travisci-2d6108f9a4f5.json
-    -d
+  - openssl aes-256-cbc -K $encrypted_b23950c7c963_key -iv $encrypted_b23950c7c963_iv -in ncryptf-travisci-2d6108f9a4f5.json.enc -out $HOME/ncryptf-travisci-2d6108f9a4f5.json -d
   - echo yes | sdkmanager tools "platform-tools" "build-tools;$ANDROID_BUILD_TOOLS"
 
 install:
