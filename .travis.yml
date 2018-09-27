@@ -47,4 +47,4 @@ script:
   - "./gradlew clean build --stacktrace --no-daemon"
   - "./gradlew :app:assembleDebug --no-daemon"
   - "./gradlew :app:assembleDebugAndroidTest --no-daemon"
-  - gcloud firebase test android run --type instrumentation --test ~/projects/ncryptf-kotlin/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk --os-version-ids 19,21,24,26,28 --device-ids NexusLowRes,Nexus5 --app  ~/projects/ncryptf-kotlin/app/dummy.apk --no-record-video --no-performance-metrics --timeout 10m
+  - echo N | gcloud firebase test android run --type instrumentation --test ~/projects/ncryptf-kotlin/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk --os-version-ids 19,21,24,26,28 --device-ids NexusLowRes,Nexus5 --app  ~/projects/ncryptf-kotlin/app/dummy.apk --no-record-video --no-performance-metrics --timeout 10m
