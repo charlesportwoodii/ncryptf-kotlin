@@ -4,6 +4,13 @@ language: android
 env:
   matrix:
     - ANDROID_API=28 ANDROID_BUILD_TOOLS=28.0.3
+  
+  global:
+    - secure: "cjl7bncu1ur9of8tGL938SDRmo5KvEPK8NGtoRAhyNknboIflv0IPSTGqmoJ/0fqXIvczIwXy4SevcIsudjbAhWak8lXdnO+q6KnYfqIdKfMVCXK6BUutmFXztPHWW6ucpKf0ZnsniwZC7lObPuEBHvv+Gj89kBencZEJBgheo7DonVzfi/Cicyj3YZJK2tvNfybKbO4ju6Dgjh+gTDQiJWfrJOa/KDuiFASS364bEd/+pfY2jBpdV/+kJIk+yO5fTLZbUOUvwU8vXvaiP935TtVOqF2jMRdAeykSlwneTjtg6H2/DBDdUHVD1aCa4cMC4Yj/RCLpfExDGFWtsvnXFE7uYC9x16J7TN/NUQ3lFu3EZzfVIAiSqTzqIQ7cOCv2PBQ4Sl4WAMnkOrbrV1rZIpcvgGRek9FYCd7K4vAugx8EkMWbVZvQ2qdwS6lQS72pBb1OgEDQVL0aC587t6A+kDCDtih/+u+7Cktg5EqUiQh/uWsvx8a+tRyqnuKKcvLcg6XiSeX81dtHU3zq4vnvGITykzlWWgbtlEWeBU++xhBrHiAwEYUitr6JBY9htK7dU0hHGNienh3NL1HE5lmxO1sdGfJGOA2KuUUaEDhV70zu+n6pJ2XB4Om7L6DY7G/YmrU366XNkpv/tXGbwtjUuvsilo6cdn3zYCueqb3ses="
+    - secure: "11pcuJygxzHHO7etPmCkTd8owDcGY0xPWdSJ9d33xUX0cnlW5otaQ3FOZLyeMPmi1X+dcstJpj8uiJ1BCDuWcUMLBXjiH1IKpz9WFPGu79OqGkUr5szTJptZrS9Rlby0B5BGaW9F06t1F/yJKtHaQ4aIXkD25X+3zM2Xuu+2WVerOOWhJpdeMqllTpWgyEW+zfVWs0CqoQfOTYY8b3aodyKdvUQ0nsgHnM2/Nc91ZKpUzmgYKsyflWSS1zKO8l0dSSFc3sGGhi0OBueFnE8Lf8ZqyaX6B4BQ0rR+L4xKATxX64Szf9Sv3g/EsSLnR4SIepyOOrMOUP4O5e38FtiBsKzcU/6Org3XYEailIHUIVc9WNO4fhzbvVk9sKkzv0gCKT/nwBwewZ6Xsxbs82upDe4dyhGt28c2iQX4ffpQSQEGz6kcrnXTyIXb3Hi7suUFX6IzvHfENQgrNA9hef2A3Yc14VocIV6VKF64V+bjFChPG401yKFs79WmavbelTT4ZZKBAiHKLLnDfhEkXdHkHK7nnm5yPr8bILY0MjlTuTgTXnhQOFvvkGdyaKt/KnzuJ6/IHoxYrDX7AIfIYRCYM05/pcUgKD+ABwqNaSTNu4ujPBDm8bAcHfoGWKSMtCxA7OzB0FyzluLudnYA5hx904lcoxSAkb5r6A2OHQsUjuU="
+cache:
+  directories:
+    - "$HOME/google-cloud-sdk/"
 
 android:
   components:
@@ -11,21 +18,37 @@ android:
     - platform-tools
     - build-tools-$ANDROID_BUILD_TOOLS
     - android-$ANDROID_API
-    - tools # This isn't redundant
+    - tools
 
 licenses:
   - android-sdk-preview-license-.+
   - android-sdk-license-.+
   - google-gdk-license-.+
-  - '.+'
+  - ".+"
 
 before_install:
+  - openssl aes-256-cbc -K $encrypted_b23950c7c963_key -iv $encrypted_b23950c7c963_iv
+    -in ncryptf-travisci-2d6108f9a4f5.json.enc -out $HOME/ncryptf-travisci-2d6108f9a4f5.json
+    -d
   - echo yes | sdkmanager tools "platform-tools" "build-tools;$ANDROID_BUILD_TOOLS"
 
-script: 
-  - "./gradlew clean build --stacktrace"
-  - "./gradlew :app:assembleDebug"
-  - "./gradlew :app:assembleDebugAndroidTest"
+install:
+  - gcloud version || true
+  - if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then rm -rf $HOME/google-cloud-sdk; export CLOUDSDK_CORE_DISABLE_PROMPTS=1; curl https://sdk.cloud.google.com | bash; fi
+  # Add gcloud to $PATH
+  - source /home/travis/google-cloud-sdk/path.bash.inc
+  - gcloud components update
+  - gcloud version
+  - gcloud config set project $GCLOUD_PROJECT
+  - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file $HOME/ncryptf-travisci-2d6108f9a4f5.json
+  - rm $HOME/ncryptf-travisci-2d6108f9a4f5.json
+
+script:
+  - "./gradlew clean build --stacktrace --no-daemon"
+  - "./gradlew :app:assembleDebug --no-daemon"
+  - "./gradlew :app:assembleDebugAndroidTest --no-daemon"
+  - gcloud firebase test android versions list
+
 #  - gcloud firebase test android run \
 #      --type instrumentation \
 #      --test ./app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
