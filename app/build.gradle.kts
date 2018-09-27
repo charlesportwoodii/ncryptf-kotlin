@@ -5,8 +5,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("com.android.library")
     id("kotlin-android")
+    id("com.github.dcendents.android-maven")
     id("org.jetbrains.dokka-android") version "0.9.17"
 }
+
+val group: String = "com.ncryptf"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
