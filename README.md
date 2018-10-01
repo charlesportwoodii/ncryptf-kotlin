@@ -245,12 +245,12 @@ val payload: String = "{\"foo\":\"bar\"}";
 
 try {
     // 32 byte secret and public key. Extract from kp.get...().getAsBytes(), or another libsodium method
-    val request: Request = Request(secretKeyBytes, publicKeyBytes);
+    val request: Request = Request(secretKeyBytes, signatureSecretKey /* token.signature */);
 
     // Cipher now contains the encryted data
     // Signature should be the signature private key previously agreed upon with the sender
     // If you're using a `Token` object, this should be the `.signature` property
-    val cipher: ByteArray = request.encrypt(payload, token.signature)
+    val cipher: ByteArray = request.encrypt(payload, clientPublicKey)
 
     // Send as encrypted request body
     val b64Body: String = Base64.getEncoder().encode(cipher)
