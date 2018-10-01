@@ -14,7 +14,6 @@ import org.apache.commons.codec.binary.Hex
 
 import com.ncryptf.android.exceptions.EncryptionFailedException
 import com.ncryptf.android.exceptions.SigningException
-import com.ncryptf.android.Keypair
 
 /**
  * @constructor Encrypts a request
@@ -23,7 +22,7 @@ import com.ncryptf.android.Keypair
  */
 public class Request constructor(
     private val secretKey: ByteArray,
-    private val publicKey: ByteArray
+    private val signatureSecretKey: ByteArray
 )
 {
     /**
@@ -32,89 +31,84 @@ public class Request constructor(
     private val sodium: LazySodiumAndroid
 
     /**
-     * Keypair
-     */
-    private val keypair: Keypair
-
-    /**
      * 24 byte nonce
      */
     private var nonce: ByteArray? = null
 
     init {
         this.sodium = LazySodiumAndroid(SodiumAndroid())
-        this.keypair = Keypair(
-            secretKey,
-            publicKey
-        )
+        
+        if (this.secretKey.size != Box.SECRETKEYBYTES) {
+            throw IllegalArgumentException(String.format("Secret key should be %d bytes", Box.SECRETKEYBYTES))
+        }
+
+        if (this.signatureSecretKey.size != Sign.SECRETKEYBYTES) {
+            throw IllegalArgumentException(String.format("Secret key should be %d bytes", Sign.SECRETKEYBYTES))
+        }
     }
 
     /**
      * Encrypts the payload
      * 
      * @param data          String payload to encrypt
-     * @param signatureKey  32 byte signing key
+     * @param remotePublicKey  32 byte signing key
      * @return              Byte array containing the encrypted data
      * @throws EncryptionFailedException
      */
-    public fun encrypt(data: String, signatureKey: ByteArray?) : ByteArray?
+    public fun encrypt(data: String, remotePublicKey: ByteArray) : ByteArray?
     {
         val nonce: ByteArray = this.sodium.randomBytesBuf(Box.NONCEBYTES)
-        return encrypt(data, signatureKey, 2, nonce)
+        return encrypt(data, remotePublicKey, 2, nonce)
     }
 
     /**
      * Encrypts the payload with a specified version, and a generated nonce
      * 
-     * @param data          String payload to encrypt
-     * @param signatureKey  32 byte signing key
-     * @param version       Version to generate
-     * @return              Byte array containing the encrypted data
+     * @param data              String payload to encrypt
+     * @param remotePublicKey   32 byte signing key
+     * @param version           Version to generate
+     * @return                  Byte array containing the encrypted data
      * @throws EncryptionFailedException
      */
-    public fun encrypt(data: String, signatureKey: ByteArray?, version: Int = 2) : ByteArray?
+    public fun encrypt(data: String, remotePublicKey: ByteArray, version: Int = 2) : ByteArray?
     {
         val nonce: ByteArray = this.sodium.randomBytesBuf(Box.NONCEBYTES)
-        return encrypt(data, signatureKey, version, nonce)
+        return encrypt(data, remotePublicKey, version, nonce)
     }
 
     /**
      * Encrypts the payload with a specified version and optional nonce
      * 
-     * @param data          String payload to encrypt
-     * @param signatureKey  32 byte signing key
-     * @param version       Version to generate
-     * @param nonce         24 byte
-     * @return              Byte array containing the encrypted data
+     * @param data              String payload to encrypt
+     * @param remotePublicKey   32 byte signing key
+     * @param version           Version to generate
+     * @param nonce             24 byte
+     * @return                  Byte array containing the encrypted data
      * @throws EncryptionFailedException
      */
-    public fun encrypt(data: String, signatureKey: ByteArray?, version: Int = 2, nonce: ByteArray) : ByteArray?
+    public fun encrypt(data: String, remotePublicKey: ByteArray, version: Int = 2, nonce: ByteArray) : ByteArray?
     {
         this.nonce = nonce
         if (version == 2) {
-            if (signatureKey == null) {
-                throw EncryptionFailedException("A signature key is expected.")
-            }
-
             val header: ByteArray = this.sodium.toBinary("DE259002")
-            val body = this.encryptBody(data, nonce)
+            val body = this.encryptBody(data, remotePublicKey, nonce)
             if (body == null) {
                 throw EncryptionFailedException("Failed to encrypt message.")
             }
 
             var publicKey: ByteArray = ByteArray(32)
 
-            if (this.sodium.getSodium().crypto_scalarmult_base(publicKey, this.keypair.secretKey) != 0) {
+            if (this.sodium.getSodium().crypto_scalarmult_base(publicKey, this.secretKey) != 0) {
                 throw EncryptionFailedException("Unable to derive public key from the provided secret key.");
             }
 
             var sigPubKey: ByteArray = ByteArray(32)
-            if (this.sodium.getSodium().crypto_sign_ed25519_sk_to_pk(sigPubKey, signatureKey) != 0) {
+            if (this.sodium.getSodium().crypto_sign_ed25519_sk_to_pk(sigPubKey, this.signatureSecretKey) != 0) {
                 throw EncryptionFailedException("Unable to derive public key from the provided signature secret key.");
             }
 
             try {
-                val signature = this.sign(data, signatureKey)
+                val signature = this.sign(data)
                 if (signature == null) {
                     throw EncryptionFailedException("Unable to derive signature.")
                 }
@@ -146,18 +140,19 @@ public class Request constructor(
             }
         }
 
-        return encryptBody(data, nonce)
+        return encryptBody(data, remotePublicKey, nonce)
     }
 
     /**
      * Encrypts the payload
      * 
-     * @param data  String payload to encrypt
-     * @param nonce 24 byte nonce
-     * @return      Byte array containing the encrypted data
+     * @param data              String payload to encrypt
+     * @param nonce             24 byte nonce
+     * @param publicKey   32 byte public key
+     * @return                  Byte array containing the encrypted data
      * @throws EncryptionFailedException
      */
-    private fun encryptBody(data: String, nonce: ByteArray) : ByteArray?
+    private fun encryptBody(data: String, publicKey: ByteArray, nonce: ByteArray) : ByteArray?
     {
         val box: Box.Native = this.sodium
         val message: ByteArray = data.toByteArray()
@@ -168,8 +163,8 @@ public class Request constructor(
             message,
             message.size.toLong(),
             nonce,
-            this.keypair.publicKey,
-            this.keypair.secretKey
+            publicKey,
+            this.secretKey
         )
 
         if (result) {
@@ -183,11 +178,10 @@ public class Request constructor(
      * Encrypts the payload
      * 
      * @param data  String payload to encrypt
-     * @param nonce 24 byte nonce
      * @return      Byte array containing the encrypted data
      * @throws EncryptionFailedException
      */
-    public fun sign(data: String, secretKey: ByteArray) : ByteArray?
+    public fun sign(data: String) : ByteArray?
     {
         val message: ByteArray = data.toByteArray()
         var signature: ByteArray = ByteArray(Sign.BYTES)
@@ -198,7 +192,7 @@ public class Request constructor(
             null,
             message,
             message.size.toLong(),
-            secretKey
+            this.signatureSecretKey
         )
 
         if (result) {

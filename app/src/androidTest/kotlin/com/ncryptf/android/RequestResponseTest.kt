@@ -56,10 +56,10 @@ public class RequestResponseTest
         try {
             val request: Request = Request(
                 this.clientKeyPairSecret,
-                this.serverKeyPairPublic
+                this.signatureKeyPairSecret
             )
 
-            val cipher: ByteArray = request.encrypt(this.payload, this.signatureKeyPairSecret, 2, this.nonce) as ByteArray
+            val cipher: ByteArray = request.encrypt(this.payload, this.serverKeyPairPublic, 2, this.nonce) as ByteArray
 
             val eCipher: String = this.sodium.toHexStr(this.expectedv2Cipher)
             val aCipher: String = this.sodium.toHexStr(cipher)
@@ -93,10 +93,10 @@ public class RequestResponseTest
         try {
             val request: Request = Request(
                 this.clientKeyPairSecret,
-                this.serverKeyPairPublic
+                this.signatureKeyPairSecret
             )
 
-            val cipher: ByteArray = request.encrypt("", this.signatureKeyPairSecret, 2, this.nonce) as ByteArray
+            val cipher: ByteArray = request.encrypt("", this.serverKeyPairPublic, 2, this.nonce) as ByteArray
 
             val response: Response = Response(
                 this.serverKeyPairSecret
@@ -119,7 +119,7 @@ public class RequestResponseTest
         }
     }
 
-    @Test(expected = DecryptionFailedException::class)
+    @Test(expected = IllegalArgumentException::class)
     fun testv2DecryptWithSmallPayload()
     {
         // Force v2 by setting the magic header
@@ -127,24 +127,22 @@ public class RequestResponseTest
         val cipher: ByteArray = header + ByteArray(231)
 
         val response: Response = Response(
-            this.serverKeyPairSecret,
-            this.clientKeyPairPublic
+            this.serverKeyPairSecret
         )
 
-        response.decrypt(cipher)
+        response.decrypt(cipher, this.clientKeyPairPublic)
     }
 
-    @Test(expected = DecryptionFailedException::class)
+    @Test(expected = IllegalArgumentException::class)
     fun testv1DecryptWithSmallPayload()
     {
         val cipher: ByteArray = ByteArray(15)
 
         val response: Response = Response(
-            this.serverKeyPairSecret,
-            this.clientKeyPairPublic
+            this.serverKeyPairSecret
         )
 
-        response.decrypt(cipher, this.nonce)
+        response.decrypt(cipher, this.clientKeyPairPublic)
     }
     
     @Test
@@ -153,18 +151,17 @@ public class RequestResponseTest
         try {
             val request: Request = Request(
                 this.clientKeyPairSecret,
-                this.serverKeyPairPublic
+                this.signatureKeyPairSecret
             )
 
-            val cipher: ByteArray = request.encrypt(this.payload, null, 1, this.nonce) as ByteArray
-            val signature: ByteArray = request.sign(this.payload, this.signatureKeyPairSecret) as ByteArray
+            val cipher: ByteArray = request.encrypt(this.payload, this.serverKeyPairPublic, 1, this.nonce) as ByteArray
+            val signature: ByteArray = request.sign(this.payload) as ByteArray
 
             val response: Response = Response(
-                this.serverKeyPairSecret,
-                this.clientKeyPairPublic
+                this.serverKeyPairSecret
             )
 
-            val decrypted: String = response.decrypt(cipher, this.nonce) as String
+            val decrypted: String = response.decrypt(cipher, this.clientKeyPairPublic, this.nonce) as String
 
             val eCipher: String = this.sodium.toHexStr(this.expectedCipher)
             val aCipher: String = this.sodium.toHexStr(cipher)
@@ -196,5 +193,19 @@ public class RequestResponseTest
         } catch (e: InvalidSignatureException) {
             fail("Signature is invalid")
         }
+    }
+
+    @Test
+    fun testPublicKeyExtraction()
+    {
+        val publicKey: ByteArray = Response.getPublicKeyFromResponse(this.expectedv2Cipher)
+        assertEquals(this.sodium.toHexStr(this.clientKeyPairPublic), this.sodium.toHexStr(publicKey))
+    }
+
+    @Test
+    fun testVersion()
+    {
+        assertEquals(1, Response.getVersion(this.expectedCipher))
+        assertEquals(2, Response.getVersion(this.expectedv2Cipher))
     }
 }

@@ -34,49 +34,64 @@ public class Response constructor(
 
     init {
         this.sodium = LazySodiumAndroid(SodiumAndroid())
-    }
 
-    /**
-     * Secondary constructor for payloads where the public is known
-     * @param secretKey     32 byte secret key
-     * @param publicKey     32 byte public key
-     */
-    constructor(secretKey: ByteArray, publicKey: ByteArray) : this(secretKey)
-    {
-        this.keypair = Keypair(secretKey, publicKey)
+        if (secretKey.size != Box.SECRETKEYBYTES) {
+            throw IllegalArgumentException(String.format("Secret key should be %d bytes", Box.SECRETKEYBYTES))
+        }
+
+        this.secretKey = secretKey
     }
 
     /**
      * Decrypts a v2 encrypted body
      * 
-     * @param response
-     * @return Decrypted response as a String
-     * @throws DecryptionFailedException
-     * @throws InvalidChecksumException
-     * @throws InvalidSignatureException
+     * @param response      Byte data returned by the server
+     * @return              Decrypted response as a String
+     * @throws DecryptionFailedException If the message could not be decrypted
+     * @throws InvalidChecksumException If the checksum generated from the message doesn't match the checksum associated with the message
+     * @throws InvalidSignatureException If the signature check fails
+     * @throws IllegalArgumentException If the response length is too short
      */
     public fun decrypt(response: ByteArray) : String?
     {
+        return this.decrypt(response, null)
+    }
+
+    /**
+     * Decrypts a v2 encrypted body
+     * 
+     * @param response      Byte data returned by the server
+     * @param publicKey     32 byte public key
+     * @return              Decrypted response as a String
+     * @throws DecryptionFailedException If the message could not be decrypted
+     * @throws InvalidChecksumException If the checksum generated from the message doesn't match the checksum associated with the message
+     * @throws InvalidSignatureException If the signature check fails
+     * @throws IllegalArgumentException If the response length is too short
+     */
+    public fun decrypt(response: ByteArray, publicKey: ByteArray?) : String?
+    {
         if (response.size < 236) {
-            throw DecryptionFailedException("Message size is too small.")
+            throw IllegalArgumentException("Message size is too small.")
         }
 
         val nonce = Arrays.copyOfRange(response, 4, 28)
-        return this.decrypt(response, nonce)
+        return this.decrypt(response, publicKey, nonce)
     }
 
     /**
      * Decrypts a v1 or a v2 encrypted body
-     * @param response
-     * @param nonce
-     * @return Decrypted response as a string
-     * @throws DecryptionFailedException
-     * @throws InvalidChecksumException
-     * @throws InvalidSignatureException
+     * @param response      Byte data returned by the server
+     * @param publicKey     32 byte public key
+     * @param nonce         24 byte nonce
+     * @return              Decrypted response as a string
+     * @throws DecryptionFailedException If the message could not be decrypted
+     * @throws InvalidChecksumException If the checksum generated from the message doesn't match the checksum associated with the message
+     * @throws InvalidSignatureException If the signature check fails
+     * @throws IllegalArgumentException If the response length is too short
      */
-    public fun decrypt(response: ByteArray, nonce: ByteArray) : String?
+    public fun decrypt(response: ByteArray, publicKey: ByteArray?, nonce: ByteArray) : String?
     {
-        val version: Int = this.getVersion(response)
+        val version: Int = Response.getVersion(response)
         if (version == 2) {
             /**
              * Payload should be a minimum of 236 bytes
@@ -89,7 +104,7 @@ public class Response constructor(
              * 64 byte checksum
              */
             if (response.size < 236) {
-                throw DecryptionFailedException("Message size is too small.")
+                throw IllegalArgumentException("Message size is too small.")
             }
 
             val payload: ByteArray = Arrays.copyOfRange(response, 0, response.size - 64)
@@ -106,14 +121,12 @@ public class Response constructor(
                 throw InvalidChecksumException("The checksum associated with the message is not valid.");
             }
 
-            val publicKey: ByteArray = Arrays.copyOfRange(response, 28, 60)
+            val extractedPublicKey: ByteArray = Arrays.copyOfRange(response, 28, 60)
             val signature: ByteArray =  Arrays.copyOfRange(payload, payload.size - 64, payload.size)
             val sigPubKey: ByteArray = Arrays.copyOfRange(payload, payload.size - 96, payload.size - 64)
             val body: ByteArray = Arrays.copyOfRange(payload, 60, payload.size - 96)
 
-            this.keypair = Keypair(this.secretKey, publicKey)
-
-            val decryptedPayload = this.decryptBody(body, nonce)
+            val decryptedPayload = this.decryptBody(body, extractedPublicKey, nonce)
             if (decryptedPayload == null) {
                 throw DecryptionFailedException("Failed to decrypt message.")
             }
@@ -129,39 +142,38 @@ public class Response constructor(
             return decryptedPayload
         }
 
-        return this.decryptBody(response, nonce)
+        if (publicKey?.size != Box.PUBLICKEYBYTES) {
+            throw IllegalArgumentException(String.format("Public key should be %d bytes", Box.PUBLICKEYBYTES))
+        }
+
+        return this.decryptBody(response, publicKey, nonce)
     }
 
     /**
      * Decrypts the raw response
      * 
      * @param response  Raw byte array response from the server
+     * @param publicKey 32 byte public key
      * @param nonce     24 byte nonce sent by the server
      * @return          Returns the decrypted payload as a string
-     * @throws DecryptionFailedException
+     * @throws DecryptionFailedException If the message could not be decrypted
      */
-    private fun decryptBody(response: ByteArray, nonce: ByteArray) : String?
+    private fun decryptBody(response: ByteArray, publicKey: ByteArray, nonce: ByteArray) : String?
     {
         val box: Box.Native = this.sodium
         if (response.size < Box.MACBYTES) {
-            throw DecryptionFailedException("Message size is too short.")
+            throw IllegalArgumentException("Message size is too short.")
         }
 
         var message: ByteArray = ByteArray(response.size - Box.MACBYTES)
-
-        if (this.keypair == null) {
-            throw DecryptionFailedException("Unable to decrypt message with provided keys.")
-        }
-
-        val kp = this.keypair as Keypair
 
         val result: Boolean = box.cryptoBoxOpenEasy(
             message,
             response,
             response.size.toLong(),
             nonce,
-            kp.publicKey,
-            kp.secretKey
+            publicKey,
+            this.secretKey
         )
 
         if (result) {
@@ -193,28 +205,76 @@ public class Response constructor(
         )
     }
 
-    /**
-     * Returns the version from the response
-     * 
-     * @param response
-     * @return int
-     * @throws DecryptionFailedException
-     */
-    private fun getVersion(response: ByteArray) : Int
-    {
-        // There should be at least 16 MACBYTES for each message.
-        // It not present, throw an exception and give up
-        if (response.size < 16) {
-            throw DecryptionFailedException("Message length is too short to determine version.")
+    companion object {
+        /**
+         * Extracts the public key from a v2 response
+         * @param response  Response bytes
+         * @return          32 byte public key
+         * @throws IllegalArgumentException If the response length is too short, or a version 1 message was passed
+         */
+        @JvmStatic
+        public fun getPublicKeyFromResponse(response: ByteArray) : ByteArray
+        {
+            val version: Int = Response.getVersion(response)
+            if (version == 2) {
+                if (response.size < 236) {
+                    throw IllegalArgumentException(String.format("Expected at least 236 bytes, got %d bytes", response.size))
+                }
+
+                return Arrays.copyOfRange(response, 28, 60)
+            }
+
+            throw IllegalArgumentException("The response provided is not suitable for public key extraction")
         }
 
-        val header: ByteArray = Arrays.copyOfRange(response, 0, 4)
-        val hex: String = this.sodium.toHexStr(header).toUpperCase()
+        /**
+         * Extracts the signature public key from a v2 response
+         * @param response  Response bytes
+         * @return          Signature public key bytes
+         * @throws IllegalArgumentException If the response length is too short, or a version 1 message was passed
+         */
+        @JvmStatic
+        public fun getSignaturePublicKeyFromResponse(response: ByteArray) : ByteArray
+        {
+            val version: Int = Response.getVersion(response)
+            if (version == 2) {
+                if (response.size < 236) {
+                    throw IllegalArgumentException(String.format("Expected at least 236 bytes, got %d bytes", response.size))
+                }
 
-        if (hex.equals("DE259002")) {
-            return 2
+                val payload: ByteArray = Arrays.copyOfRange(response, 0, response.size - 64)
+
+                return Arrays.copyOfRange(payload, payload.size - 96, payload.size - 64)
+            }
+
+            throw IllegalArgumentException("The response provided is not suitable for public key extraction")
         }
 
-        return 1
+        /**
+        * Returns the version from the response
+        * 
+        * @param response  Response bytes
+        * @return int      The version
+        * @throws IllegalArgumentException If the response length is too short.
+        */
+        @JvmStatic
+        public fun getVersion(response: ByteArray) : Int
+        {
+            val sodium: LazySodiumAndroid = LazySodiumAndroid(SodiumAndroid())
+            // There should be at least 16 MACBYTES for each message.
+            // It not present, throw an exception and give up
+            if (response.size < 16) {
+                throw IllegalArgumentException("Message length is too short to determine version.")
+            }
+
+            val header: ByteArray = Arrays.copyOfRange(response, 0, 4)
+            val hex: String = sodium.toHexStr(header).toUpperCase()
+
+            if (hex.equals("DE259002")) {
+                return 2
+            }
+
+            return 1
+        }
     }
 }
