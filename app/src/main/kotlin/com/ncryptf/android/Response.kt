@@ -228,29 +228,6 @@ public class Response constructor(
         }
 
         /**
-         * Extracts the signature public key from a v2 response
-         * @param response  Response bytes
-         * @return          Signature public key bytes
-         * @throws IllegalArgumentException If the response length is too short, or a version 1 message was passed
-         */
-        @JvmStatic
-        public fun getSignaturePublicKeyFromResponse(response: ByteArray) : ByteArray
-        {
-            val version: Int = Response.getVersion(response)
-            if (version == 2) {
-                if (response.size < 236) {
-                    throw IllegalArgumentException(String.format("Expected at least 236 bytes, got %d bytes", response.size))
-                }
-
-                val payload: ByteArray = Arrays.copyOfRange(response, 0, response.size - 64)
-
-                return Arrays.copyOfRange(payload, payload.size - 96, payload.size - 64)
-            }
-
-            throw IllegalArgumentException("The response provided is not suitable for public key extraction")
-        }
-
-        /**
         * Returns the version from the response
         * 
         * @param response  Response bytes
