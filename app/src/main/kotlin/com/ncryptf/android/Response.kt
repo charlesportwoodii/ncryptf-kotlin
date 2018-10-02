@@ -161,6 +161,11 @@ public class Response constructor(
     private fun decryptBody(response: ByteArray, publicKey: ByteArray, nonce: ByteArray) : String?
     {
         val box: Box.Native = this.sodium
+
+        if (publicKey.size != Box.PUBLICKEYBYTES) {
+            throw IllegalArgumentException(String.format("Public key should be %d bytes", Box.PUBLICKEYBYTES))
+        }
+
         if (response.size < Box.MACBYTES) {
             throw IllegalArgumentException("Message size is too short.")
         }

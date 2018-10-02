@@ -51,29 +51,29 @@ public class Request constructor(
      * Encrypts the payload
      * 
      * @param data          String payload to encrypt
-     * @param remotePublicKey  32 byte signing key
+     * @param publicKey  32 byte signing key
      * @return              Byte array containing the encrypted data
      * @throws EncryptionFailedException
      */
-    public fun encrypt(data: String, remotePublicKey: ByteArray) : ByteArray?
+    public fun encrypt(data: String, publicKey: ByteArray) : ByteArray?
     {
         val nonce: ByteArray = this.sodium.randomBytesBuf(Box.NONCEBYTES)
-        return encrypt(data, remotePublicKey, 2, nonce)
+        return encrypt(data, publicKey, 2, nonce)
     }
 
     /**
      * Encrypts the payload with a specified version, and a generated nonce
      * 
      * @param data              String payload to encrypt
-     * @param remotePublicKey   32 byte signing key
+     * @param publicKey   32 byte signing key
      * @param version           Version to generate
      * @return                  Byte array containing the encrypted data
      * @throws EncryptionFailedException
      */
-    public fun encrypt(data: String, remotePublicKey: ByteArray, version: Int = 2) : ByteArray?
+    public fun encrypt(data: String, publicKey: ByteArray, version: Int = 2) : ByteArray?
     {
         val nonce: ByteArray = this.sodium.randomBytesBuf(Box.NONCEBYTES)
-        return encrypt(data, remotePublicKey, version, nonce)
+        return encrypt(data, publicKey, version, nonce)
     }
 
     /**
@@ -89,6 +89,10 @@ public class Request constructor(
     public fun encrypt(data: String, remotePublicKey: ByteArray, version: Int = 2, nonce: ByteArray) : ByteArray?
     {
         this.nonce = nonce
+        if (remotePublicKey.size != Box.PUBLICKEYBYTES) {
+            throw IllegalArgumentException(String.format("Public key should be %d bytes", Box.PUBLICKEYBYTES))
+        }
+
         if (version == 2) {
             val header: ByteArray = this.sodium.toBinary("DE259002")
             val body = this.encryptBody(data, remotePublicKey, nonce)
@@ -154,6 +158,10 @@ public class Request constructor(
      */
     private fun encryptBody(data: String, publicKey: ByteArray, nonce: ByteArray) : ByteArray?
     {
+        if (publicKey.size != Box.PUBLICKEYBYTES) {
+            throw IllegalArgumentException(String.format("Public key should be %d bytes", Box.PUBLICKEYBYTES))
+        }
+
         val box: Box.Native = this.sodium
         val message: ByteArray = data.toByteArray()
         var cipher: ByteArray = ByteArray(Box.MACBYTES + message.size)
