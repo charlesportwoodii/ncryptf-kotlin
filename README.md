@@ -1,17 +1,17 @@
 # ncryptf Kotlin (Android)
 
-[![TravisCI](https://img.shields.io/travis/charlesportwoodii/ncryptf-kotlin.svg?style=flat-square "TravisCI")](https://travis-ci.com/charlesportwoodii/ncryptf-kotlin)
-[![License](https://img.shields.io/badge/license-BSD-orange.svg?style=flat-square "License")](https://github.com/charlesportwoodii/ncryptf-kotlin/blob/master/LICENSE.md)
+[![TravisCI](https://img.shields.io/travis/ncryptf/ncryptf-kotlin.svg?style=flat-square "TravisCI")](https://travis-ci.com/ncryptf/ncryptf-kotlin)
+[![License](https://img.shields.io/badge/license-BSD-orange.svg?style=flat-square "License")](https://github.com/ncryptf/ncryptf-kotlin/blob/master/LICENSE.md)
 
 <center>
-    <img src="https://github.com/charlesportwoodii/ncryptf-kotlin/blob/master/logo.png?raw=true" alt="ncryptf logo" width="400px"/>
+    <img src="https://github.com/ncryptf/ncryptf-kotlin/blob/master/logo.png?raw=true" alt="ncryptf logo" width="400px"/>
 </center>
 
 A Android library written in Kotlin for facilitating hashed based KDF signature authentication, and end-to-end encrypted communication with compatible API's.
 
 ## Android
 
-This is an Android Kotlin library. If you're looking for general Kotlin or Java support, check out [ncryptf-java](https://github.com/charlesportwoodii/ncryptf-java) instead. This libray should have full Java interop for Android applications written in Java instead of Kotlin.
+This is an Android Kotlin library. If you're looking for general Kotlin or Java support, check out [ncryptf-java](https://github.com/ncryptf/ncryptf-java) instead. This libray should have full Java interop for Android applications written in Java instead of Kotlin.
 
 ## Installing
 
@@ -33,7 +33,7 @@ allprojects {
 2. Add this repository as a dependency. Be sure to replace `LATEST_TAG_FROM_GITHUB` appropriately.
 ```kotlin
 dependencies {
-    implementation("com.github.charlesportwoodii:ncryptf-java:LATEST_TAG_FROM_GITHUB")
+    implementation("com.github.ncryptf:ncryptf-java:LATEST_TAG_FROM_GITHUB")
 }
 ```
 
@@ -51,7 +51,7 @@ allprojects {
 2. Add this repository as a dependency. Be sure to replace `LATEST_TAG_FROM_GITHUB` appropriately.
 ```
 dependencies {
-    implementation "com.github.charlesportwoodii:ncryptf-java:LATEST_TAG_FROM_GITHUB" 
+    implementation "com.github.ncryptf:ncryptf-java:LATEST_TAG_FROM_GITHUB" 
 }
 ```
 
