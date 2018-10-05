@@ -80,29 +80,34 @@ public class Request constructor(
      * Encrypts the payload with a specified version and optional nonce
      * 
      * @param data              String payload to encrypt
-     * @param remotePublicKey   32 byte signing key
+     * @param publicKey   32 byte signing key
      * @param version           Version to generate
      * @param nonce             24 byte
      * @return                  Byte array containing the encrypted data
      * @throws EncryptionFailedException
      */
-    public fun encrypt(data: String, remotePublicKey: ByteArray, version: Int = 2, nonce: ByteArray) : ByteArray?
+    public fun encrypt(data: String, publicKey: ByteArray, version: Int = 2, nonce: ByteArray) : ByteArray?
     {
+        if (nonce.size != Box.NONCEBYTES) {
+            throw IllegalArgumentException(String.format("Nonce should be %d bytes", Box.NONCEBYTES))
+        }
+
         this.nonce = nonce
-        if (remotePublicKey.size != Box.PUBLICKEYBYTES) {
+
+        if (publicKey.size != Box.PUBLICKEYBYTES) {
             throw IllegalArgumentException(String.format("Public key should be %d bytes", Box.PUBLICKEYBYTES))
         }
 
         if (version == 2) {
             val header: ByteArray = this.sodium.toBinary("DE259002")
-            val body = this.encryptBody(data, remotePublicKey, nonce)
+            val body = this.encryptBody(data, publicKey, nonce)
             if (body == null) {
                 throw EncryptionFailedException("Failed to encrypt message.")
             }
 
-            var publicKey: ByteArray = ByteArray(32)
+            var iPublicKey: ByteArray = ByteArray(32)
 
-            if (this.sodium.getSodium().crypto_scalarmult_base(publicKey, this.secretKey) != 0) {
+            if (this.sodium.getSodium().crypto_scalarmult_base(iPublicKey, this.secretKey) != 0) {
                 throw EncryptionFailedException("Unable to derive public key from the provided secret key.");
             }
 
@@ -120,7 +125,7 @@ public class Request constructor(
                 var stream: ByteArrayOutputStream = ByteArrayOutputStream()
                 stream.write(header)
                 stream.write(nonce)
-                stream.write(publicKey)
+                stream.write(iPublicKey)
                 stream.write(body)
                 stream.write(sigPubKey)
                 stream.write(signature)
@@ -144,7 +149,7 @@ public class Request constructor(
             }
         }
 
-        return encryptBody(data, remotePublicKey, nonce)
+        return encryptBody(data, publicKey, nonce)
     }
 
     /**
@@ -160,6 +165,10 @@ public class Request constructor(
     {
         if (publicKey.size != Box.PUBLICKEYBYTES) {
             throw IllegalArgumentException(String.format("Public key should be %d bytes", Box.PUBLICKEYBYTES))
+        }
+
+        if (nonce.size != Box.NONCEBYTES) {
+            throw IllegalArgumentException(String.format("Nonce should be %d bytes", Box.NONCEBYTES))
         }
 
         val box: Box.Native = this.sodium

@@ -10,4 +10,13 @@ public data class Keypair constructor(
     val publicKey: ByteArray
 )
 {
+    init {
+        if (this.secretKey.size % 16 != 0) {
+            throw IllegalArgumentException(String.format("Secret key should be a multiple of %d bytes", 16))
+        }
+
+        if (this.publicKey.size % 4 != 0) {
+            throw IllegalArgumentException(String.format("Public key should be a multiple of %d bytes", 4))
+        }
+    }
 }

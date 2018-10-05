@@ -21,6 +21,16 @@ public data class Token constructor(
     val expiresAt: Double
 )
 {
+    init {
+        if (this.ikm.size != 32) {
+            throw IllegalArgumentException(String.format("Initial key material should be %d bytes", 32))
+        }
+
+        if (this.signature.size != 64) {
+            throw IllegalArgumentException(String.format("Signature secret key should be %d bytes", 64))
+        }
+    }
+
     /**
      * Returns true if the given token is expired, and false otherwise
      * @return Boolean

@@ -19,7 +19,7 @@ import com.ncryptf.android.exceptions.SignatureVerificationException
  * @param secretKey
  */
 public class Response constructor(
-    private var secretKey: ByteArray
+    private val secretKey: ByteArray
 )
 {
     /**
@@ -27,19 +27,12 @@ public class Response constructor(
      */
     private val sodium: LazySodiumAndroid
 
-    /**
-     * Keypair
-     */
-    private var keypair: Keypair? = null
-
     init {
         this.sodium = LazySodiumAndroid(SodiumAndroid())
 
-        if (secretKey.size != Box.SECRETKEYBYTES) {
+        if (this.secretKey.size != Box.SECRETKEYBYTES) {
             throw IllegalArgumentException(String.format("Secret key should be %d bytes", Box.SECRETKEYBYTES))
         }
-
-        this.secretKey = secretKey
     }
 
     /**
@@ -92,6 +85,11 @@ public class Response constructor(
     public fun decrypt(response: ByteArray, publicKey: ByteArray?, nonce: ByteArray) : String?
     {
         val version: Int = Response.getVersion(response)
+
+        if (nonce.size != Box.NONCEBYTES) {
+            throw IllegalArgumentException(String.format("Nonce should be %d bytes", Box.NONCEBYTES))
+        }
+        
         if (version == 2) {
             /**
              * Payload should be a minimum of 236 bytes
@@ -166,6 +164,10 @@ public class Response constructor(
             throw IllegalArgumentException(String.format("Public key should be %d bytes", Box.PUBLICKEYBYTES))
         }
 
+        if (nonce.size != Box.NONCEBYTES) {
+            throw IllegalArgumentException(String.format("Nonce should be %d bytes", Box.NONCEBYTES))
+        }
+
         if (response.size < Box.MACBYTES) {
             throw IllegalArgumentException("Message size is too short.")
         }
@@ -199,6 +201,14 @@ public class Response constructor(
      */
     public fun isSignatureValid(response: String, signature: ByteArray, publicKey: ByteArray) : Boolean
     {
+        if (signature.size != 64) {
+            throw IllegalArgumentException(String.format("Signature should be %d bytes", 64))
+        }
+
+        if (publicKey.size != Sign.PUBLICKEYBYTES) {
+            throw IllegalArgumentException(String.format("Public key should be %d bytes", Sign.PUBLICKEYBYTES))
+        }
+
         val sign: Sign.Native = this.sodium
         val message: ByteArray = response.toByteArray()
 
@@ -245,7 +255,7 @@ public class Response constructor(
             val sodium: LazySodiumAndroid = LazySodiumAndroid(SodiumAndroid())
             // There should be at least 16 MACBYTES for each message.
             // It not present, throw an exception and give up
-            if (response.size < 16) {
+            if (response.size < Box.MACBYTES) {
                 throw IllegalArgumentException("Message length is too short to determine version.")
             }
 
