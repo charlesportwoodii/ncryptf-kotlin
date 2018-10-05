@@ -216,8 +216,7 @@ Encryption uses a sodium crypto box. A keypair can be generated as follows
 ```kotlin
 import com.ncryptf.android.Utils;
 import com.ncryptf.android.Keypair;
-// You should type check this is not null
-val kp = Utils.generateKeypair() as Keypair
+val kp = Utils.generateKeypair() as? Keypair
 ```
 
 #### Signing Keys
@@ -227,8 +226,7 @@ Encryption uses a sodium signature. A keypair for signing can be generated as fo
 ```kotlin
 import com.ncryptf.android.Utils
 import com.ncryptf.android.Keypair
-// You should type check this is not null
-val kp = Utils.generateSigningKeypair() as Keypair
+val kp = Utils.generateSigningKeypair() as? Keypair
 ```
 
 ### Encrypted Request Body
@@ -277,8 +275,7 @@ try {
     val responseFromServer: ByteArray = Base64.getDecoder().decode("<HTTP-Response-Body>")
     val response: Response = Response(clientSecretKey)
 
-    // You should null check this
-    val decrypted = response.decrypt(responseFromServer) as String
+    val decrypted = response.decrypt(responseFromServer) as? String
     
 } catch (e: InvalidChecksumException) {
     // Checksum is not valid. Request body was tampered with
