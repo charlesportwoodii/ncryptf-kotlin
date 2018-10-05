@@ -115,7 +115,7 @@ public class Response constructor(
             }
 
             // If the checksum is invalid, throw an exception
-            if (!Arrays.equals(checksum, calculatedChecksum)) {
+            if (this.sodium.getSodium().sodium_memcmp(checksum, calculatedChecksum, 64) != 0) {
                 throw InvalidChecksumException("The checksum associated with the message is not valid.");
             }
 
