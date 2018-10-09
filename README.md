@@ -33,7 +33,7 @@ allprojects {
 2. Add this repository as a dependency. Be sure to replace `LATEST_TAG_FROM_GITHUB` appropriately.
 ```kotlin
 dependencies {
-    implementation("com.github.ncryptf:ncryptf-java:LATEST_TAG_FROM_GITHUB")
+    implementation("com.github.ncryptf:ncryptf-kotlin:LATEST_TAG_FROM_GITHUB")
 }
 ```
 
@@ -51,7 +51,7 @@ allprojects {
 2. Add this repository as a dependency. Be sure to replace `LATEST_TAG_FROM_GITHUB` appropriately.
 ```
 dependencies {
-    implementation "com.github.ncryptf:ncryptf-java:LATEST_TAG_FROM_GITHUB" 
+    implementation "com.github.ncryptf:ncryptf-kotlin:LATEST_TAG_FROM_GITHUB" 
 }
 ```
 
