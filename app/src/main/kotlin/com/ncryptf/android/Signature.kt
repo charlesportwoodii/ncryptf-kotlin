@@ -18,7 +18,7 @@ public class Signature
     companion object {
         /**
          * Constructs a new v2 signature
-         * 
+         *
          * @param httpMethod    The HTTP method
          * @param uri           The full URI with query string parameters
          * @param salt          32 byte salt
@@ -34,7 +34,7 @@ public class Signature
 
         /**
          * Constructs versioned signature
-         * 
+         *
          * @param httpMethod    The HTTP method
          * @param uri           The full URI with query string parameters
          * @param salt          32 byte salt
@@ -52,7 +52,7 @@ public class Signature
             val b64Salt: String = Base64.encodeToString(salt, Base64.DEFAULT or Base64.NO_WRAP)
             val timestamp: String = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss Z").format(date).replace(" GMT", " +0000");
 
-            return hash + "\n" + 
+            return hash + "\n" +
                method + "+" + uri + "\n" +
                timestamp + "\n" +
                b64Salt
@@ -60,7 +60,7 @@ public class Signature
 
         /**
          * Returns the signature hash
-         * 
+         *
          * @param data      The data to hash
          * @param salt      32 byte salt
          * @param version   The signature hash version to generate.

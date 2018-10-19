@@ -4,6 +4,8 @@ import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.ZoneOffset
 
 import com.ncryptf.android.Utils
+import com.goterl.lazycode.lazysodium.LazySodiumAndroid
+import com.goterl.lazycode.lazysodium.SodiumAndroid
 
 /**
  * @constructor Data class for storing token details
@@ -39,5 +41,20 @@ public data class Token constructor(
     {
         val now = ZonedDateTime.now(ZoneOffset.UTC).toEpochSecond()
         return now > this.expiresAt
+    }
+
+    /**
+     * Extracts the signature public key from the provided private key
+     * @return ByteArray
+     */
+    public fun getSignaturePublicKey() : ByteArray?
+    {
+        val sodium: LazySodiumAndroid = LazySodiumAndroid(SodiumAndroid())
+        val publicKey: ByteArray = ByteArray(32);
+        if (sodium.getSodium().crypto_sign_ed25519_sk_to_pk(publicKey, this.signature) != 0) {
+            return null
+        }
+
+        return publicKey
     }
 }

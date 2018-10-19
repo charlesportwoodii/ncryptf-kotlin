@@ -25,6 +25,8 @@ android {
         versionName = "0.2.0"
         multiDexEnabled = true
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArgument("NCRYPTF_TEST_API", System.getenv("NCRYPTF_TEST_API") ?: "_")
+        testInstrumentationRunnerArgument("ACCESS_TOKEN", System.getenv("ACCESS_TOKEN") ?: "_")
         //testInstrumentationRunnerArgument("runnerBuilder", "de.mannodermaus.junit5.AndroidJUnit5Builder")
     }
 
@@ -85,7 +87,7 @@ android {
     }
 }
 
-val dokka by tasks.getting(org.jetbrains.dokka.gradle.DokkaAndroidTask::class) {    
+val dokka by tasks.getting(org.jetbrains.dokka.gradle.DokkaAndroidTask::class) {
     outputFormat = "html"
     outputDirectory = "$buildDir/javadoc"
     jdkVersion = 8
@@ -108,14 +110,18 @@ dependencies {
     implementation("commons-codec:commons-codec:1.11:@jar")
 
     // for java.time.* classes
-    implementation("com.jakewharton.threetenabp:threetenabp:1.1.0")
+    implementation("com.jakewharton.threetenabp:threetenabp:1.1.1")
+
     testImplementation("junit:junit:4.12")
+
+    androidTestImplementation("com.squareup.okio:okio:2.1.0@jar")
+    androidTestImplementation("com.squareup.okhttp3:okhttp:3.11.0@jar")
 
     androidTestImplementation("com.android.support.test:runner:1.0.2")
     androidTestImplementation("com.android.support.test:rules:1.0.2")
 
     androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.2")
-    
+
     //testImplementation("org.junit.jupiter:junit-jupiter-api:5.2.0")
     //testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.2.0")
     //testImplementation("org.junit.jupiter:junit-jupiter-params:5.2.0")

@@ -16,7 +16,7 @@ public class RequestResponseTest
 {
     private val clientKeyPairSecret: ByteArray = Base64.decode("bvV/vnfB43spmprI8aBK/Fd8xxSBlx7EhuxfxxTVI2o=", Base64.DEFAULT)
     private val clientKeyPairPublic: ByteArray = Base64.decode("Ojnr0KQy6GJ6x+eQa+wNwdHejZo8vY5VNyZY5NfwBjU=", Base64.DEFAULT)
-    
+
     private val serverKeyPairSecret: ByteArray = Base64.decode("gH1+ileX1W5fMeOWue8HxdREnK04u72ybxCQgivWoZ4=", Base64.DEFAULT)
     private val serverKeyPairPublic: ByteArray = Base64.decode("YU74X2OqHujLVDH9wgEHscD5eyiLPvcugRUZG6R3BB8=", Base64.DEFAULT)
 
@@ -49,7 +49,7 @@ public class RequestResponseTest
     init {
         this.sodium = LazySodiumAndroid(SodiumAndroid())
     }
-    
+
     @Test
     fun testv2EncryptDecrypt()
     {
@@ -144,7 +144,7 @@ public class RequestResponseTest
 
         response.decrypt(cipher, this.clientKeyPairPublic)
     }
-    
+
     @Test
     fun testv1EncryptDecrypt()
     {

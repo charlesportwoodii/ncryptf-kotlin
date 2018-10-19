@@ -37,7 +37,7 @@ public class Response constructor(
 
     /**
      * Decrypts a v2 encrypted body
-     * 
+     *
      * @param response      Byte data returned by the server
      * @return              Decrypted response as a String
      * @throws DecryptionFailedException If the message could not be decrypted
@@ -52,7 +52,7 @@ public class Response constructor(
 
     /**
      * Decrypts a v2 encrypted body
-     * 
+     *
      * @param response      Byte data returned by the server
      * @param publicKey     32 byte public key
      * @return              Decrypted response as a String
@@ -89,7 +89,7 @@ public class Response constructor(
         if (nonce.size != Box.NONCEBYTES) {
             throw IllegalArgumentException(String.format("Nonce should be %d bytes", Box.NONCEBYTES))
         }
-        
+
         if (version == 2) {
             /**
              * Payload should be a minimum of 236 bytes
@@ -149,7 +149,7 @@ public class Response constructor(
 
     /**
      * Decrypts the raw response
-     * 
+     *
      * @param response  Raw byte array response from the server
      * @param publicKey 32 byte public key
      * @param nonce     24 byte nonce sent by the server
@@ -192,7 +192,7 @@ public class Response constructor(
 
     /**
      * Returns true if the detached signature is valid
-     * 
+     *
      * @param response  The decrypted response to verify
      * @param signature 64 byte signature
      * @param publicKey 32 byte public key of the signature
@@ -244,7 +244,7 @@ public class Response constructor(
 
         /**
         * Returns the version from the response
-        * 
+        *
         * @param response  Response bytes
         * @return int      The version
         * @throws IllegalArgumentException If the response length is too short.

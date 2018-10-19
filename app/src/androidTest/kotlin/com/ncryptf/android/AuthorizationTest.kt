@@ -5,11 +5,11 @@ import org.junit.Assert.*
 import com.ncryptf.android.Authorization
 import com.ncryptf.android.exceptions.KeyDerivationException
 
-import android.util.Base64;
-import org.json.JSONObject;
+import android.util.Base64
+import org.json.JSONObject
 
-import org.threeten.bp.ZoneOffset;
-import org.threeten.bp.ZonedDateTime;
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.ZonedDateTime
 
 public class AuthorizationTest: AbstractTest()
 {

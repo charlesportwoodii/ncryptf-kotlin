@@ -37,7 +37,7 @@ public class Request constructor(
 
     init {
         this.sodium = LazySodiumAndroid(SodiumAndroid())
-        
+
         if (this.secretKey.size != Box.SECRETKEYBYTES) {
             throw IllegalArgumentException(String.format("Secret key should be %d bytes", Box.SECRETKEYBYTES))
         }
@@ -49,7 +49,7 @@ public class Request constructor(
 
     /**
      * Encrypts the payload
-     * 
+     *
      * @param data          String payload to encrypt
      * @param publicKey  32 byte signing key
      * @return              Byte array containing the encrypted data
@@ -63,7 +63,7 @@ public class Request constructor(
 
     /**
      * Encrypts the payload with a specified version, and a generated nonce
-     * 
+     *
      * @param data              String payload to encrypt
      * @param publicKey   32 byte signing key
      * @param version           Version to generate
@@ -78,7 +78,7 @@ public class Request constructor(
 
     /**
      * Encrypts the payload with a specified version and optional nonce
-     * 
+     *
      * @param data              String payload to encrypt
      * @param publicKey   32 byte signing key
      * @param version           Version to generate
@@ -154,7 +154,7 @@ public class Request constructor(
 
     /**
      * Encrypts the payload
-     * 
+     *
      * @param data              String payload to encrypt
      * @param nonce             24 byte nonce
      * @param publicKey   32 byte public key
@@ -193,7 +193,7 @@ public class Request constructor(
 
     /**
      * Encrypts the payload
-     * 
+     *
      * @param data  String payload to encrypt
      * @return      Byte array containing the encrypted data
      * @throws EncryptionFailedException

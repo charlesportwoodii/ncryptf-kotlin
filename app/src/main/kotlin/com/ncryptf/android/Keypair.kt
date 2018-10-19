@@ -6,7 +6,7 @@ package com.ncryptf.android
  * @param publicKey 32 byte public key
  */
 public data class Keypair constructor(
-    val secretKey: ByteArray, 
+    val secretKey: ByteArray,
     val publicKey: ByteArray
 )
 {

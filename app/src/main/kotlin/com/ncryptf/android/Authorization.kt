@@ -64,7 +64,7 @@ public class Authorization constructor(
 
     /**
      * Primary constructor
-     * 
+     *
      * @param httpMethod    The HTTP method
      * @param uri           The URI with query string parameters
      * @param token         A Token object
@@ -82,7 +82,7 @@ public class Authorization constructor(
 
     /**
      * Versioned constructor
-     * 
+     *
      * @param httpMethod    The HTTP method
      * @param uri           The URI with query string parameters
      * @param token         A Token object
@@ -119,7 +119,7 @@ public class Authorization constructor(
             this.payload,
             version
         )
-        
+
         val hkdf: ByteArray = HKDF.fromHmacSha256().expand(
             HKDF.fromHmacSha256().extract(this.salt as ByteArray, this.token.ikm),
             Authorization.AUTH_INFO.toByteArray(),
@@ -133,7 +133,7 @@ public class Authorization constructor(
 
             val HMAC: Mac = Mac.getInstance("HMACSHA256")
             val secretKey: SecretKeySpec = SecretKeySpec(key, "HMACSHA256")
-            
+
             HMAC.init(secretKey)
             this.hmac = HMAC.doFinal(sig)
         } catch (e: NoSuchAlgorithmException) {
