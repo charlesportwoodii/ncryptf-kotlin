@@ -21,7 +21,7 @@ This library can be installed through JitPack:
 
 #### Kotlin build.gradlle.kts
 1. Add `jitpack.io` to your root `bundle.gradle` file:
-```kotlin
+```
 allprojects {
     repositories {
         ...
@@ -31,9 +31,9 @@ allprojects {
 ```
 
 2. Add this repository as a dependency. Be sure to replace `LATEST_TAG_FROM_GITHUB` appropriately.
-```kotlin
+```
 dependencies {
-    implementation("com.github.ncryptf:ncryptf-kotlin:LATEST_TAG_FROM_GITHUB")
+    implementation("com.ncryptf:ncryptf-kotlin:LATEST_TAG_FROM_GITHUB")
 }
 ```
 
