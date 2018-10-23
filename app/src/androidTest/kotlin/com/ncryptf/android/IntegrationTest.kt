@@ -1,7 +1,6 @@
 package com.ncryptf.android.Test
 
 import android.util.Base64
-import android.util.Log
 import android.support.test.InstrumentationRegistry
 
 import okhttp3.OkHttpClient
