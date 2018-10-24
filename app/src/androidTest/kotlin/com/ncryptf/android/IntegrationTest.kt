@@ -1,13 +1,20 @@
 package com.ncryptf.android.Test
 
+import com.ncryptf.android.Test.Tls12SocketFactory
+
 import android.util.Base64
+import android.util.Log
 import android.support.test.InstrumentationRegistry
+import android.os.Build
 
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.Request.Builder
 import okhttp3.Request
 import okhttp3.Response
+import okhttp3.ConnectionSpec
+import okhttp3.CipherSuite
+import okhttp3.TlsVersion
 
 import org.junit.Test
 import org.junit.Assert.*
@@ -24,6 +31,9 @@ import org.threeten.bp.ZonedDateTime;
 import com.goterl.lazycode.lazysodium.LazySodiumAndroid
 import com.goterl.lazycode.lazysodium.SodiumAndroid
 
+import javax.net.ssl.SSLSocket
+import javax.net.ssl.SSLSocketFactory
+import javax.net.ssl.SSLContext
 
 /**
  * This class demonstrates a practical end-to-end implementation via cURL
@@ -104,6 +114,7 @@ public class IntegrationTest
     fun testEphemeralKeyBootstrap()
     {
         assumeTrue(this.url != "")
+        assumeTrue(Build.VERSION.SDK_INT != 19) // Skip SDK 19 for now
 
         val client: OkHttpClient = OkHttpClient()
         try {
@@ -153,6 +164,8 @@ public class IntegrationTest
     fun testUnauthenticatedEncryptedRequest()
     {
         assumeTrue(this.url != "")
+        assumeTrue(Build.VERSION.SDK_INT != 19) // Skip SDK 19 for now
+
         this.testEphemeralKeyBootstrap()
         val stack: JSONObject = this.ephemeralKeyBootstrap
 
@@ -214,10 +227,12 @@ public class IntegrationTest
     fun testAuthenticateWithEncryptedRequest()
     {
         assumeTrue(this.url != "")
+        assumeTrue(Build.VERSION.SDK_INT != 19) // Skip SDK 19 for now
+
         this.testEphemeralKeyBootstrap()
         val stack: JSONObject = this.ephemeralKeyBootstrap
 
-        val client: OkHttpClient = OkHttpClient()
+       val client: OkHttpClient = OkHttpClient()
         try {
             val builder: Builder = Builder()
                 .addHeader("Accept", "application/vnd.ncryptf+json")
@@ -451,6 +466,8 @@ public class IntegrationTest
     fun testMalformedEncryptedRequest()
     {
         assumeTrue(this.url != "")
+        assumeTrue(Build.VERSION.SDK_INT != 19) // Skip SDK 19 for now
+
         this.testEphemeralKeyBootstrap()
         val stack: JSONObject = this.ephemeralKeyBootstrap
 
