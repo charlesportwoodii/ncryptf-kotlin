@@ -81,7 +81,7 @@ public class IntegrationTest
 
     /**
      * Token generated from authenticated
-     *This is a hack to get around the lack of shared states between tests.
+     * This is a hack to get around the lack of shared states between tests.
      */
     private lateinit var authToken: Token
 
