@@ -1,7 +1,5 @@
 package com.ncryptf.android.Test
 
-import com.ncryptf.android.Test.Tls12SocketFactory
-
 import android.util.Base64
 import android.util.Log
 import android.support.test.InstrumentationRegistry
