@@ -299,7 +299,7 @@ public class IntegrationTest
      * @return void
      */
     @Test
-    fun tesTauthenticatedEchoWithEncryptedRequest()
+    fun testAuthenticatedEchoWithEncryptedRequest()
     {
         this.testAuthenticateWithEncryptedRequest()
         val stack: JSONObject = this.ephemeralKeyBootstrap
