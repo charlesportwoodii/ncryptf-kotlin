@@ -103,19 +103,19 @@ println("Kotlin Version: " + version)
 dependencies {
     implementation(kotlin("stdlib-jdk8", KotlinCompilerVersion.VERSION))
 
-    implementation("com.goterl.lazycode:lazysodium-android:3.3.0@aar")
-    implementation("net.java.dev.jna:jna:4.5.2@aar")
+    implementation("com.goterl.lazycode:lazysodium-android:3.5.0@aar") // 3.6.0 cryptoGenericHash throws an error. Wait to update
+    implementation("net.java.dev.jna:jna:5.2.0@aar")
 
-    implementation("at.favre.lib:hkdf:1.0.0")
+    implementation("at.favre.lib:hkdf:1.0.2")
     implementation("commons-codec:commons-codec:1.11:@jar")
 
     // for java.time.* classes
-    implementation("com.jakewharton.threetenabp:threetenabp:1.1.1")
+    implementation("com.jakewharton.threetenabp:threetenabp:1.2.0")
 
     testImplementation("junit:junit:4.12")
 
-    androidTestImplementation("com.squareup.okio:okio:2.1.0@jar")
-    androidTestImplementation("com.squareup.okhttp3:okhttp:3.11.0@jar")
+    androidTestImplementation("com.squareup.okio:okio:2.2.2@jar") // Needed for SDK 19 support
+    androidTestImplementation("com.squareup.okhttp3:okhttp:3.11.0@jar")  // Needed for SDK 19 support
 
     androidTestImplementation("com.android.support.test:runner:1.0.2")
     androidTestImplementation("com.android.support.test:rules:1.0.2")
